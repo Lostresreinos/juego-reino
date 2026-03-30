@@ -19,10 +19,16 @@ document.getElementById("form-reino").addEventListener("submit", async function(
     .eq("usado", false)
     .single();
 
-  if (error || !data) {
-    alert("Ese código no es válido.");
-    return;
-  }
+  if (error) {
+  console.log("ERROR:", error);
+  alert("Error técnico, revisa consola");
+  return;
+}
+
+if (!data) {
+  alert("Ese código no existe o ya fue usado");
+  return;
+}
 
   await cliente
     .from("invitaciones")
