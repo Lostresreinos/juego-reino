@@ -1,92 +1,76 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <title>Acceso al Reino</title>
-</head>
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 
-<body style="background:black; color:white; text-align:center; font-family:sans-serif;">
+<script>
+window.onload = function () {
 
-  <h1>Acceso al Reino 👑</h1>
+  const supabaseUrl = "https://mqzvblzlazoywekqvkmd.supabase.co";
+  const supabaseKey = "sb_publishable_8Vci9ZkcMUJFXa6ehz14yw_OIFEb_Ff";
 
-  <form id="form-reino">
+  const cliente = window.supabase.createClient(supabaseUrl, supabaseKey);
 
-    <input type="text" id="nombre" placeholder="Tu nombre"><br><br>
+  const form = document.getElementById("form-reino");
 
-    <input type="email" id="email" placeholder="Tu email"><br><br>
+  if (!form) {
+    alert("No hay formulario en esta página");
+    return;
+  }
 
-    <input type="text" id="codigo" placeholder="Código de acceso"><br><br>
+  form.addEventListener("submit", async function(e) {
+    e.preventDefault();
 
-    <button type="submit">Entrar</button>
+    const nombre = document.getElementById("nombre").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const codigo = document.getElementById("codigo").value.trim();
 
-  </form>
+    if (!nombre || !email || !codigo) {
+      alert("Completa todos los campos");
+      return;
+    }
 
-  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    // 🔎 VALIDAR CÓDIGO
+    const { data, error } = await cliente
+      .from("invitaciones")
+      .select("*")
+      .eq("codigo", codigo)
+      .eq("usado", false)
+      .single();
 
-  <script>
-  window.onload = function () {
+    if (error || !data) {
+      alert("Ese código no es válido");
+      return;
+    }
 
-    const supabaseUrl = "https://mqzvblzlazoywekqvkmd.supabase.co";
-    const supabaseKey = "sb_publishable_8Vci9ZkcMUJFXa6ehz14yw_OIFEb_Ff";
+    // 🔒 MARCAR COMO USADO
+    await cliente
+      .from("invitaciones")
+      .update({ usado: true })
+      .eq("codigo", codigo);
 
-    const cliente = window.supabase.createClient(supabaseUrl, supabaseKey);
+    // 👤 GUARDAR USUARIO
+    await cliente
+      .from("usuarios")
+      .insert([
+        {
+          nombre: nombre,
+          email: email,
+          codigo: codigo
+        }
+      ]);
 
-    const form = document.getElementById("form-reino");
+    // 🔑 ACTIVAR ACCESO
+    localStorage.setItem("acceso_valido", "true");
 
-    form.addEventListener("submit", async function(e) {
-      e.preventDefault();
+    alert("Acceso concedido 👑");
 
-      const nombre = document.getElementById("nombre").value.trim();
-      const email = document.getElementById("email").value.trim();
-      const codigo = document.getElementById("codigo").value.trim();
+    // 🚪 REDIRECCIÓN FORZADA
+    window.location.assign("https://www.ajetrez.com/juego.html");
 
-      if (!nombre || !email || !codigo) {
-        alert("Completa todos los campos");
-        return;
-      }
+    // 🛟 RESPALDO (SI VERCEL BLOQUEA)
+    setTimeout(() => {
+      window.open("https://www.ajetrez.com/juego.html", "_blank");
+    }, 500);
 
-      // VALIDAR CÓDIGO
-      const { data, error } = await cliente
-        .from("invitaciones")
-        .select("*")
-        .eq("codigo", codigo)
-        .eq("usado", false)
-        .single();
+  });
 
-      if (error || !data) {
-        alert("Ese código no es válido");
-        return;
-      }
-
-      // MARCAR COMO USADO
-      await cliente
-        .from("invitaciones")
-        .update({ usado: true })
-        .eq("codigo", codigo);
-
-      // GUARDAR USUARIO
-      await cliente
-        .from("usuarios")
-        .insert([
-          {
-            nombre: nombre,
-            email: email,
-            codigo: codigo
-          }
-        ]);
-
-      // ACTIVAR ACCESO
-      localStorage.setItem("acceso_valido", "true");
-
-      alert("Acceso concedido 👑");
-
-     window.location.assign("https://www.ajetrez.com/juego.html");
-    });
-setTimeout(() => {
-  window.open("https://www.ajetrez.com/juego.html", "_blank");
-}, 500);
-  };
-  </script>
-
-</body>
-</html>
+};
+</script>
