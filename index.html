@@ -19,6 +19,43 @@
 <body>
 
 <h1>⚔️ El Reino está despertando…</h1>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 
+<script>
+const supabaseUrl = "https://mqzvblzlazoywekqvkmd.supabase.co";
+const supabaseKey = "sb_publishable_8Vci9ZkcMUJFXa6ehz14yw_OIFEb_Ff";
+
+const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+document.getElementById("form-reino").addEventListener("submit", async function(e) {
+  e.preventDefault();
+
+  const codigo = document.getElementById("codigo").value;
+
+  // 🔍 Buscar código
+  const { data, error } = await supabase
+    .from("invitaciones")
+    .select("*")
+    .eq("codigo", codigo)
+    .eq("usado", false)
+    .single();
+
+  if (error || !data) {
+    alert("Código inválido o ya usado");
+    return;
+  }
+
+  // 🔒 Marcar como usado
+  await supabase
+    .from("invitaciones")
+    .update({ usado: true })
+    .eq("codigo", codigo);
+
+  alert("Acceso concedido 👑");
+
+  // Aquí puedes redirigir
+  window.location.href = "/juego.html";
+});
+</script>
 </body>
 </html>
