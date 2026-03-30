@@ -1,41 +1,51 @@
-<script type="module">
-import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 
-const supabaseUrl = "https://mqzvblzlazoywekqvkmd.supabase.co";
-const supabaseKey = "sb_publishable_8Vci9ZkcMUJFXa6ehz14yw_OIFEb_Ff";
+<script>
+window.onload = function () {
 
-const cliente = createClient(supabaseUrl, supabaseKey);
+  const supabaseUrl = "https://mqzvblzlazoywekqvkmd.supabase.co";
+  const supabaseKey = "sb_publishable_8Vci9ZkcMUJFXa6ehz14yw_OIFEb_Ff";
 
-document.getElementById("form-reino").addEventListener("submit", async function(e) {
-  e.preventDefault();
+  const cliente = window.supabase.createClient(supabaseUrl, supabaseKey);
 
-  const codigo = document.getElementById("codigo").value;
+  const form = document.getElementById("form-reino");
 
-  const { data, error } = await cliente
-    .from("invitaciones")
-    .select("*")
-    .eq("codigo", codigo)
-    .eq("usado", false)
-    .single();
-
-  if (error) {
-    console.log(error);
-    alert("Error técnico");
+  if (!form) {
+    alert("Formulario no encontrado");
     return;
   }
 
-  if (!data) {
-    alert("Ese código no es válido");
-    return;
-  }
+  form.addEventListener("submit", async function(e) {
+    e.preventDefault();
 
-  await cliente
-    .from("invitaciones")
-    .update({ usado: true })
-    .eq("codigo", codigo);
+    const codigo = document.getElementById("codigo").value;
 
-  alert("Acceso concedido 👑");
+    const { data, error } = await cliente
+      .from("invitaciones")
+      .select("*")
+      .eq("codigo", codigo)
+      .eq("usado", false)
+      .single();
 
-  window.location.href = "/juego.html";
-});
+    if (error) {
+      alert("Error técnico");
+      return;
+    }
+
+    if (!data) {
+      alert("Ese código no es válido");
+      return;
+    }
+
+    await cliente
+      .from("invitaciones")
+      .update({ usado: true })
+      .eq("codigo", codigo);
+
+    alert("Acceso concedido 👑");
+
+    window.location.href = "/juego.html";
+  });
+
+};
 </script>
