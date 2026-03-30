@@ -1,60 +1,73 @@
-<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Acceso al Reino</title>
+</head>
 
-<script>
-window.onload = function () {
+<body style="background:black; color:white; text-align:center; font-family:sans-serif;">
 
-  const supabaseUrl = "https://mqzvblzlazoywekqvkmd.supabase.co";
-  const supabaseKey = "sb_publishable_8Vci9ZkcMUJFXa6ehz14yw_OIFEb_Ff";
+  <h1>Acceso al Reino 👑</h1>
 
-  const cliente = window.supabase.createClient(supabaseUrl, supabaseKey);
+  <form id="form-reino">
+    <input 
+      type="text" 
+      id="codigo" 
+      placeholder="Ingresa tu código"
+      style="padding:10px; font-size:16px;"
+    >
+    <br><br>
+    <button type="submit" style="padding:10px 20px;">
+      Entrar
+    </button>
+  </form>
 
-  // Busca cualquier formulario en la página
-  const form = document.querySelector("form");
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 
-  if (!form) {
-    alert("No hay formulario en esta página");
-    return;
-  }
+  <script>
+  window.onload = function () {
 
-  form.addEventListener("submit", async function(e) {
-    e.preventDefault();
+    const supabaseUrl = "https://mqzvblzlazoywekqvkmd.supabase.co";
+    const supabaseKey = "sb_publishable_8Vci9ZkcMUJFXa6ehz14yw_OIFEb_Ff";
 
-    // Busca cualquier input tipo texto (el código)
-    const input = document.querySelector("input[type='text']");
+    const cliente = window.supabase.createClient(supabaseUrl, supabaseKey);
 
-    if (!input) {
-      alert("No se encontró el campo de código");
-      return;
-    }
+    const form = document.getElementById("form-reino");
 
-    const codigo = input.value.trim();
+    form.addEventListener("submit", async function(e) {
+      e.preventDefault();
 
-    if (!codigo) {
-      alert("Ingresa un código");
-      return;
-    }
+      const codigo = document.getElementById("codigo").value.trim();
 
-    const { data, error } = await cliente
-      .from("invitaciones")
-      .select("*")
-      .eq("codigo", codigo)
-      .eq("usado", false)
-      .single();
+      if (!codigo) {
+        alert("Ingresa un código");
+        return;
+      }
 
-    if (error || !data) {
-      alert("Ese código no es válido");
-      return;
-    }
+      const { data, error } = await cliente
+        .from("invitaciones")
+        .select("*")
+        .eq("codigo", codigo)
+        .eq("usado", false)
+        .single();
 
-    await cliente
-      .from("invitaciones")
-      .update({ usado: true })
-      .eq("codigo", codigo);
+      if (error || !data) {
+        alert("Ese código no es válido");
+        return;
+      }
 
-    alert("Acceso concedido 👑");
+      await cliente
+        .from("invitaciones")
+        .update({ usado: true })
+        .eq("codigo", codigo);
 
-    window.location.href = "/juego.html";
-  });
+      alert("Acceso concedido 👑");
 
-};
-</script>
+      window.location.href = "/juego.html";
+    });
+
+  };
+  </script>
+
+</body>
+</html>
