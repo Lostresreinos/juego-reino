@@ -10,16 +10,15 @@
   <h1>Acceso al Reino 👑</h1>
 
   <form id="form-reino">
-    <input 
-      type="text" 
-      id="codigo" 
-      placeholder="Ingresa tu código"
-      style="padding:10px; font-size:16px;"
-    >
-    <br><br>
-    <button type="submit" style="padding:10px 20px;">
-      Entrar
-    </button>
+
+    <input type="text" id="nombre" placeholder="Tu nombre"><br><br>
+
+    <input type="email" id="email" placeholder="Tu email"><br><br>
+
+    <input type="text" id="codigo" placeholder="Código de acceso"><br><br>
+
+    <button type="submit">Entrar</button>
+
   </form>
 
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
@@ -37,13 +36,16 @@
     form.addEventListener("submit", async function(e) {
       e.preventDefault();
 
+      const nombre = document.getElementById("nombre").value.trim();
+      const email = document.getElementById("email").value.trim();
       const codigo = document.getElementById("codigo").value.trim();
 
-      if (!codigo) {
-        alert("Ingresa un código");
+      if (!nombre || !email || !codigo) {
+        alert("Completa todos los campos");
         return;
       }
 
+      // VALIDAR CÓDIGO
       const { data, error } = await cliente
         .from("invitaciones")
         .select("*")
@@ -56,13 +58,27 @@
         return;
       }
 
+      // MARCAR COMO USADO
       await cliente
         .from("invitaciones")
         .update({ usado: true })
         .eq("codigo", codigo);
 
-      alert("Acceso concedido 👑");
+      // GUARDAR USUARIO
+      await cliente
+        .from("usuarios")
+        .insert([
+          {
+            nombre: nombre,
+            email: email,
+            codigo: codigo
+          }
+        ]);
+
+      // ACTIVAR ACCESO
       localStorage.setItem("acceso_valido", "true");
+
+      alert("Acceso concedido 👑");
 
       window.location.href = "https://www.ajetrez.com/juego.html";
     });
