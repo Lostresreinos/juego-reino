@@ -2,29 +2,20 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Login - Los Tres Reinos</title>
+<title>Login</title>
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 </head>
 
 <body style="background:black; color:white; text-align:center; font-family:sans-serif;">
 
 <h1>👑 Acceso al Reino</h1>
 
-<h3>Registrarse (requiere código)</h3>
+<h3>Iniciar sesión</h3>
 
 <input id="email" type="email" placeholder="Email"><br><br>
 <input id="password" type="password" placeholder="Password"><br><br>
-<input id="codigo" type="text" placeholder="Código de invitación"><br><br>
-<button onclick="registrar()">Crear cuenta</button>
 
-<br><br><br>
-
-<h3>Iniciar sesión</h3>
-
-<input id="email_login" type="email" placeholder="Email"><br><br>
-<input id="password_login" type="password" placeholder="Password"><br><br>
 <button onclick="login()">Entrar</button>
-
-<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 
 <script>
 const supabase = window.supabase.createClient(
@@ -32,99 +23,27 @@ const supabase = window.supabase.createClient(
   "sb_publishable_8Vci9ZkcMUJFXa6ehz14yw_OIFEb_Ff"
 );
 
-// 🔹 REGISTRAR USUARIO CON CÓDIGO
-async function registrar() {
-
-  const email = document.getElementById("email").value.trim();
-  const password = document.getElementById("password").value.trim();
-  const codigo = document.getElementById("codigo").value.trim();
-
-  if (!email || !password || !codigo) {
-    alert("Completa todos los campos");
-    return;
-  }
-
-  // 1) Validar código disponible
-  const { data: invitacion, error: errorInv } = await supabase
-    .from("invitaciones")
-    .select("*")
-    .eq("codigo", codigo)
-    .eq("usado", false)
-    .single();
-
-  if (errorInv || !invitacion) {
-    alert("Código inválido o ya usado");
-    return;
-  }
-
-  // 2) Crear usuario en Auth
-  const { data, error } = await supabase.auth.signUp({
-    email,
-    password
-  });
-
-  if (error) {
-    alert(error.message);
-    return;
-  }
-
-  const user = data.user;
-  if (!user) {
-    alert("Error creando usuario");
-    return;
-  }
-
-  // 3) Guardar en tabla usuarios
-  const { error: errorInsert } = await supabase
-    .from("usuarios")
-    .insert([
-      {
-        id: user.id,
-        email: email,
-        codigo: codigo
-      }
-    ]);
-
-  if (errorInsert) {
-    alert("Error guardando usuario");
-    return;
-  }
-
-  // 4) Consumir código (uso único)
-  const { error: errorUpdate } = await supabase
-    .from("invitaciones")
-    .update({
-      usado: true,
-      usado_en_juego: false,
-      usado_por: user.id
-    })
-    .eq("codigo", codigo);
-
-  if (errorUpdate) {
-    alert("Error actualizando código");
-    return;
-  }
-
-  alert("Cuenta creada correctamente 👑");
-
-}
-
-// 🔹 LOGIN
 async function login() {
 
-  const email = document.getElementById("email_login").value;
-  const password = document.getElementById("password_login").value;
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
 
-  const { error } = await supabase.auth.signInWithPassword({
+  const { data, error } = await supabase.auth.signInWithPassword({
     email,
     password
   });
 
   if (error) {
     alert(error.message);
-  } else {
-    window.location.href = "https://www.ajetrez.com/juego.html";
+    return;
   }
+
+  // 🔥 GUARDAR SESIÓN MANUALMENTE
+  localStorage.setItem("user_id", data.user.id);
+
+  alert("Login correcto 👑");
+
+  window.location.href = "https://www.ajetrez.com/juego.html";
 }
 </script>
 
