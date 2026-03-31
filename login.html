@@ -31,23 +31,50 @@ const supabase = window.supabase.createClient(
   "sb_publishable_8Vci9ZkcMUJFXa6ehz14yw_OIFEb_Ff"
 );
 
+// 🔹 REGISTRAR USUARIO
 async function registrar() {
+
   const email = document.getElementById("email").value;
   const password = document.getElementById("password").value;
 
-  const { error } = await supabase.auth.signUp({
+  const { data, error } = await supabase.auth.signUp({
     email,
     password
   });
 
   if (error) {
     alert(error.message);
-  } else {
-    alert("Cuenta creada");
+    return;
   }
+
+  const user = data.user;
+
+  if (!user) {
+    alert("Error creando usuario");
+    return;
+  }
+
+  // 🔥 GUARDAR EN TU TABLA usuarios
+  const { error: errorInsert } = await supabase
+    .from("usuarios")
+    .insert([
+      {
+        id: user.id,
+        email: email
+      }
+    ]);
+
+  if (errorInsert) {
+    alert("Error guardando usuario en tabla");
+    return;
+  }
+
+  alert("Cuenta creada correctamente 👑");
 }
 
+// 🔹 LOGIN
 async function login() {
+
   const email = document.getElementById("email_login").value;
   const password = document.getElementById("password_login").value;
 
@@ -62,6 +89,7 @@ async function login() {
     window.location.href = "https://www.ajetrez.com/juego.html";
   }
 }
+
 </script>
 
 </body>
