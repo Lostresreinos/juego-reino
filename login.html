@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Login - Los Tres Reinos</title>
+</head>
+
+<body style="background:black; color:white; text-align:center; font-family:sans-serif;">
+
+<h1>👑 Acceso al Reino</h1>
+
+<h3>Registrarse</h3>
+
+<input id="email" type="email" placeholder="Email"><br><br>
+<input id="password" type="password" placeholder="Password"><br><br>
+<button onclick="registrar()">Crear cuenta</button>
+
+<br><br><br>
+
+<h3>Iniciar sesión</h3>
+
+<input id="email_login" type="email" placeholder="Email"><br><br>
+<input id="password_login" type="password" placeholder="Password"><br><br>
+<button onclick="login()">Entrar</button>
+
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+
+<script>
+const supabase = window.supabase.createClient(
+  "https://mqzvblzlazoywekqvkmd.supabase.co",
+  "sb_publishable_8Vci9ZkcMUJFXa6ehz14yw_OIFEb_Ff"
+);
+
+async function registrar() {
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+
+  const { error } = await supabase.auth.signUp({
+    email,
+    password
+  });
+
+  if (error) {
+    alert(error.message);
+  } else {
+    alert("Cuenta creada");
+  }
+}
+
+async function login() {
+  const email = document.getElementById("email_login").value;
+  const password = document.getElementById("password_login").value;
+
+  const { error } = await supabase.auth.signInWithPassword({
+    email,
+    password
+  });
+
+  if (error) {
+    alert(error.message);
+  } else {
+    window.location.href = "https://www.ajetrez.com/juego.html";
+  }
+}
+</script>
+
+</body>
+</html>
