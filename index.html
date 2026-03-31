@@ -21,5 +21,66 @@
 
   </form>
 
+  <!-- SUPABASE -->
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+
+  <script>
+  window.onload = function () {
+
+    const supabaseUrl = "https://mqzvblzlazoywekqvkmd.supabase.co";
+    const supabaseKey = "sb_publishable_8Vci9ZkcMUJFXa6ehz14yw_OIFEb_Ff";
+
+    const cliente = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+    const form = document.getElementById("form-reino");
+
+    form.addEventListener("submit", async function(e) {
+      e.preventDefault();
+
+      const nombre = document.getElementById("nombre").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const codigo = document.getElementById("codigo").value.trim();
+
+      if (!nombre || !email || !codigo) {
+        alert("Completa todos los campos");
+        return;
+      }
+
+      // VALIDAR CÓDIGO
+      const { data, error } = await cliente
+        .from("invitaciones")
+        .select("*")
+        .eq("codigo", codigo)
+        .eq("usado", false)
+        .single();
+
+      if (error || !data) {
+        alert("Ese código no es válido");
+        return;
+      }
+
+      // MARCAR COMO USADO
+      await cliente
+        .from("invitaciones")
+        .update({ usado: true })
+        .eq("codigo", codigo);
+
+      // GUARDAR USUARIO
+      await cliente
+        .from("usuarios")
+        .insert([
+          { nombre, email, codigo }
+        ]);
+
+      alert("Acceso concedido 👑");
+
+      // 🔐 REDIRECCIÓN CON TOKEN
+      window.location.href = "https://www.ajetrez.com/juego.html?token=" + codigo;
+
+    });
+
+  };
+  </script>
+
 </body>
 </html>
