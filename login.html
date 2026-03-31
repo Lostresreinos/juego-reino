@@ -2,18 +2,48 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Login</title>
+<title>Acceso al Reino</title>
+
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+
+<style>
+body {
+  background:black;
+  color:white;
+  text-align:center;
+  font-family:sans-serif;
+}
+input {
+  padding:8px;
+  margin:5px;
+  width:220px;
+}
+button {
+  padding:8px 20px;
+  margin-top:10px;
+}
+</style>
 </head>
 
-<body style="background:black; color:white; text-align:center; font-family:sans-serif;">
+<body>
 
 <h1>👑 Acceso al Reino</h1>
 
+<!-- 🔹 REGISTRO -->
+<h3>Registrarse</h3>
+
+<input id="email_reg" type="email" placeholder="Email"><br>
+<input id="password_reg" type="password" placeholder="Password"><br>
+
+<button onclick="registrar()">Crear cuenta</button>
+
+<br><br><br>
+
+<!-- 🔹 LOGIN -->
 <h3>Iniciar sesión</h3>
 
-<input id="email" type="email" placeholder="Email"><br><br>
-<input id="password" type="password" placeholder="Password"><br><br>
+<input id="email_log" type="email" placeholder="Email"><br>
+<input id="password_log" type="password" placeholder="Password"><br>
 
 <button onclick="login()">Entrar</button>
 
@@ -23,10 +53,45 @@ const supabase = window.supabase.createClient(
   "sb_publishable_8Vci9ZkcMUJFXa6ehz14yw_OIFEb_Ff"
 );
 
+// 🔥 REGISTRAR
+async function registrar() {
+
+  const email = document.getElementById("email_reg").value;
+  const password = document.getElementById("password_reg").value;
+
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password
+  });
+
+  if (error) {
+    alert("ERROR: " + error.message);
+    return;
+  }
+
+  const user = data.user;
+
+  if (!user) {
+    alert("Error creando usuario");
+    return;
+  }
+
+  // guardar en tabla usuarios
+  await supabase.from("usuarios").insert([
+    {
+      id: user.id,
+      email: email
+    }
+  ]);
+
+  alert("Cuenta creada 👑");
+}
+
+// 🔥 LOGIN
 async function login() {
 
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
+  const email = document.getElementById("email_log").value;
+  const password = document.getElementById("password_log").value;
 
   const { data, error } = await supabase.auth.signInWithPassword({
     email,
@@ -34,14 +99,12 @@ async function login() {
   });
 
   if (error) {
-    alert(error.message);
+    alert("ERROR: " + error.message);
     return;
   }
 
-  // 🔥 GUARDAR SESIÓN MANUALMENTE
+  // guardar sesión en este dominio
   localStorage.setItem("user_id", data.user.id);
-
-  alert("Login correcto 👑");
 
   window.location.href = "https://www.ajetrez.com/juego.html";
 }
