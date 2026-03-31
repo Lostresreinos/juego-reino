@@ -1,113 +1,74 @@
 <!DOCTYPE html>
-<html lang="es">
+<html>
 <head>
-<meta charset="UTF-8">
-<title>Acceso al Reino</title>
-
-<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-
-<style>
-body {
-  background:black;
-  color:white;
-  text-align:center;
-  font-family:sans-serif;
-}
-input {
-  padding:8px;
-  margin:5px;
-  width:220px;
-}
-button {
-  padding:8px 20px;
-  margin-top:10px;
-}
-</style>
+  <title>LTR Login</title>
 </head>
-
 <body>
 
-<h1>👑 Acceso al Reino</h1>
+<h2>Registro / Login</h2>
 
-<!-- 🔹 REGISTRO -->
-<h3>Registrarse</h3>
+<input type="email" id="email" placeholder="Email"><br><br>
+<input type="password" id="password" placeholder="Password"><br><br>
 
-<input id="email_reg" type="email" placeholder="Email"><br>
-<input id="password_reg" type="password" placeholder="Password"><br>
+<button id="btnRegistro">Registrarse</button>
+<button id="btnLogin">Login</button>
 
-<button onclick="registrar()">Crear cuenta</button>
-
-<br><br><br>
-
-<!-- 🔹 LOGIN -->
-<h3>Iniciar sesión</h3>
-
-<input id="email_log" type="email" placeholder="Email"><br>
-<input id="password_log" type="password" placeholder="Password"><br>
-
-<button onclick="login()">Entrar</button>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
-const supabase = window.supabase.createClient(
-  "https://mqzvblzlazoywekqvkmd.supabase.co",
-  "sb_publishable_8Vci9ZkcMUJFXa6ehz14yw_OIFEb_Ff"
-);
+// ⚠️ REEMPLAZA ESTO
+const SUPABASE_URL = "https://TU_PROJECT.supabase.co";
+const SUPABASE_KEY = "TU_ANON_KEY";
 
-// 🔥 REGISTRAR
+// Crear cliente
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// -------- REGISTRO --------
 async function registrar() {
+  console.log("🔥 CLICK REGISTRO");
 
-  const email = document.getElementById("email_reg").value;
-  const password = document.getElementById("password_reg").value;
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
 
   const { data, error } = await supabase.auth.signUp({
-    email,
-    password
+    email: email,
+    password: password
   });
 
+  console.log("RESULTADO REGISTRO:", data, error);
+
   if (error) {
-    alert("ERROR: " + error.message);
-    return;
+    alert("Error: " + error.message);
+  } else {
+    alert("Usuario creado correctamente");
   }
-
-  const user = data.user;
-
-  if (!user) {
-    alert("Error creando usuario");
-    return;
-  }
-
-  // guardar en tabla usuarios
-  await supabase.from("usuarios").insert([
-    {
-      id: user.id,
-      email: email
-    }
-  ]);
-
-  alert("Cuenta creada 👑");
 }
 
-// 🔥 LOGIN
+// -------- LOGIN --------
 async function login() {
+  console.log("🔥 CLICK LOGIN");
 
-  const email = document.getElementById("email_log").value;
-  const password = document.getElementById("password_log").value;
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
 
   const { data, error } = await supabase.auth.signInWithPassword({
-    email,
-    password
+    email: email,
+    password: password
   });
 
+  console.log("RESULTADO LOGIN:", data, error);
+
   if (error) {
-    alert("ERROR: " + error.message);
-    return;
+    alert("Error login: " + error.message);
+  } else {
+    alert("Login exitoso");
   }
-
-  // guardar sesión en este dominio
-  localStorage.setItem("user_id", data.user.id);
-
-  window.location.href = "https://www.ajetrez.com/juego.html";
 }
+
+// -------- EVENTOS --------
+document.getElementById("btnRegistro").addEventListener("click", registrar);
+document.getElementById("btnLogin").addEventListener("click", login);
+
 </script>
 
 </body>
