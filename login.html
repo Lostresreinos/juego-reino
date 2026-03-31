@@ -10,65 +10,42 @@
 <input type="email" id="email" placeholder="Email"><br><br>
 <input type="password" id="password" placeholder="Password"><br><br>
 
-<button id="btnRegistro">Registrarse</button>
-<button id="btnLogin">Login</button>
+<button onclick="registrar()">Registrarse</button>
+<button onclick="login()">Login</button>
+
+<script>
+console.log("✅ SCRIPT CARGADO");
+</script>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
-// ⚠️ REEMPLAZA ESTO
+// ⚠️ COLOCA TUS DATOS AQUÍ
 const SUPABASE_URL = "https://TU_PROJECT.supabase.co";
 const SUPABASE_KEY = "TU_ANON_KEY";
 
-// Crear cliente
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// -------- REGISTRO --------
 async function registrar() {
   console.log("🔥 CLICK REGISTRO");
 
   const email = document.getElementById("email").value;
   const password = document.getElementById("password").value;
 
+  console.log("EMAIL:", email);
+  console.log("PASSWORD:", password);
+
   const { data, error } = await supabase.auth.signUp({
     email: email,
     password: password
   });
 
-  console.log("RESULTADO REGISTRO:", data, error);
-
-  if (error) {
-    alert("Error: " + error.message);
-  } else {
-    alert("Usuario creado correctamente");
-  }
+  console.log("RESULTADO:", data, error);
 }
 
-// -------- LOGIN --------
 async function login() {
   console.log("🔥 CLICK LOGIN");
-
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
-
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email: email,
-    password: password
-  });
-
-  console.log("RESULTADO LOGIN:", data, error);
-
-  if (error) {
-    alert("Error login: " + error.message);
-  } else {
-    alert("Login exitoso");
-  }
 }
-
-// -------- EVENTOS --------
-document.getElementById("btnRegistro").addEventListener("click", registrar);
-document.getElementById("btnLogin").addEventListener("click", login);
-
 </script>
 
 </body>
