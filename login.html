@@ -13,19 +13,22 @@
 <button onclick="registrar()">Registrarse</button>
 <button onclick="login()">Login</button>
 
+<!-- SCRIPT DE PRUEBA -->
 <script>
 console.log("✅ SCRIPT CARGADO");
 </script>
 
+<!-- SUPABASE -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
-// ⚠️ COLOCA TUS DATOS AQUÍ
-const SUPABASE_URL = "https://TU_PROJECT.supabase.co";
-const SUPABASE_KEY = "TU_ANON_KEY";
+// 🔹 CONFIGURACIÓN YA LISTA (NO CAMBIAR NADA)
+const SUPABASE_URL = "https://mqzvblzla20ywekvqkmd.supabase.co";
+const SUPABASE_KEY = "sb_publishable_8Vci9ZkcMUJFXa6ehz14yw_OIFEb_Ff";
 
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+// -------- REGISTRO --------
 async function registrar() {
   console.log("🔥 CLICK REGISTRO");
 
@@ -40,11 +43,34 @@ async function registrar() {
     password: password
   });
 
-  console.log("RESULTADO:", data, error);
+  console.log("RESULTADO REGISTRO:", data, error);
+
+  if (error) {
+    alert("Error: " + error.message);
+  } else {
+    alert("Usuario creado correctamente");
+  }
 }
 
+// -------- LOGIN --------
 async function login() {
   console.log("🔥 CLICK LOGIN");
+
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email: email,
+    password: password
+  });
+
+  console.log("RESULTADO LOGIN:", data, error);
+
+  if (error) {
+    alert("Error login: " + error.message);
+  } else {
+    alert("Login exitoso");
+  }
 }
 </script>
 
