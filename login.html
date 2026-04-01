@@ -13,16 +13,12 @@
 <button onclick="registrar()">Registrarse</button>
 <button onclick="login()">Login</button>
 
-<!-- SCRIPT DE PRUEBA -->
-<script>
-console.log("✅ SCRIPT CARGADO");
-</script>
+<h3 id="estado">Estado: esperando acción...</h3>
 
-<!-- SUPABASE -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
-// 🔹 CONFIGURACIÓN YA LISTA (NO CAMBIAR NADA)
+// 🔹 CONFIGURACIÓN (YA LISTA)
 const SUPABASE_URL = "https://mqzvblzla20ywekvqkmd.supabase.co";
 const SUPABASE_KEY = "sb_publishable_8Vci9ZkcMUJFXa6ehz14yw_OIFEb_Ff";
 
@@ -30,31 +26,28 @@ const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // -------- REGISTRO --------
 async function registrar() {
-  console.log("🔥 CLICK REGISTRO");
+  document.getElementById("estado").innerText = "CLICK DETECTADO";
 
   const email = document.getElementById("email").value;
   const password = document.getElementById("password").value;
 
-  console.log("EMAIL:", email);
-  console.log("PASSWORD:", password);
+  document.getElementById("estado").innerText = "Registrando usuario...";
 
   const { data, error } = await supabase.auth.signUp({
     email: email,
     password: password
   });
 
-  console.log("RESULTADO REGISTRO:", data, error);
-
   if (error) {
-    alert("Error: " + error.message);
+    document.getElementById("estado").innerText = "ERROR: " + error.message;
   } else {
-    alert("Usuario creado correctamente");
+    document.getElementById("estado").innerText = "USUARIO CREADO CORRECTAMENTE";
   }
 }
 
 // -------- LOGIN --------
 async function login() {
-  console.log("🔥 CLICK LOGIN");
+  document.getElementById("estado").innerText = "Intentando login...";
 
   const email = document.getElementById("email").value;
   const password = document.getElementById("password").value;
@@ -64,12 +57,10 @@ async function login() {
     password: password
   });
 
-  console.log("RESULTADO LOGIN:", data, error);
-
   if (error) {
-    alert("Error login: " + error.message);
+    document.getElementById("estado").innerText = "ERROR LOGIN: " + error.message;
   } else {
-    alert("Login exitoso");
+    document.getElementById("estado").innerText = "LOGIN EXITOSO";
   }
 }
 </script>
